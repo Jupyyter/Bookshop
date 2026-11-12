@@ -1,0 +1,21 @@
+# Local development database. Start it with: docker compose up -d
+services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bookshop
+      POSTGRES_PASSWORD: bookshop # fine for a local dev database, never for a real server
+      POSTGRES_DB: bookshop
+    ports:
+      - "127.0.0.1:15432:5432" # reachable only from this computer, not from your Wi-Fi network
+    volumes:
+      - pgdata:/var/lib/postgresql # Postgres 18+ keeps its data here; the volume survives restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookshop -d bookshop"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
