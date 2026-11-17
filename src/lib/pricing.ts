@@ -12,6 +12,11 @@ export function priceCentsFor(bookId: string, pages: number | null): number {
   return (Math.floor(base + variation) + 1) * 100 - 1; // always ends in .99
 }
 
+export const CURRENCY = "eur";
+export const STANDARD_SHIPPING_CENTS = 499;
+export const EXPRESS_SHIPPING_CENTS = 999;
+export const FREE_SHIPPING_FROM_CENTS = 5000; // standard shipping is free from €50
+
 const euros = new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR" });
 
 export function formatPrice(cents: number) {

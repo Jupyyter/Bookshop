@@ -3,9 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { updateQuantity } from "@/app/actions/cart";
+import { saveForLater } from "@/app/actions/wishlist";
+import { type AddressOption, CheckoutButton } from "@/components/checkout-button";
+import { addressLines, listAddresses } from "@/lib/addresses";
 import { MAX_QUANTITY, readCart } from "@/lib/cart";
 import { coverUrl, getBookDetails } from "@/lib/openlibrary";
-import { formatPrice, priceCentsFor } from "@/lib/pricing";
+import { FREE_SHIPPING_FROM_CENTS, formatPrice, priceCentsFor, STANDARD_SHIPPING_CENTS } from "@/lib/pricing";
+import { getCurrentUser } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Your cart" };
 
@@ -22,6 +26,7 @@ export default function CartPage() {
 
 async function CartContents() {
   const cart = await readCart();
+  const signedIn = Boolean(await getCurrentUser()); // "Save for later" needs an account
 
   if (cart.length === 0) {
     return (
@@ -95,6 +100,12 @@ async function CartContents() {
                 <button name="quantity" value={0} className="ml-4 text-zinc-500 underline hover:text-zinc-900 dark:hover:text-zinc-100">
                   Remove
                 </button>
+                {signedIn && (
+                  // formAction sends this one button's click to a different action than the rest of the form.
+                  <button formAction={saveForLater} className="text-zinc-500 underline hover:text-zinc-900 dark:hover:text-zinc-100">
+                    Save for later
+                  </button>
+                )}
               </form>
             </div>
 
@@ -107,14 +118,27 @@ async function CartContents() {
         <span>Subtotal</span>
         <span className="font-semibold">{formatPrice(subtotal)}</span>
       </div>
-      <p className="mt-1 text-sm text-zinc-500">Shipping is calculated at checkout.</p>
+      <p className="mt-1 text-sm text-zinc-500">
+        Standard shipping {formatPrice(STANDARD_SHIPPING_CENTS)}, free from {formatPrice(FREE_SHIPPING_FROM_CENTS)}.
+        You choose the shipping method on the payment page.
+      </p>
 
-      <button
-        disabled
-        className="mt-6 w-full rounded-lg bg-zinc-900 px-6 py-3 font-medium text-white opacity-50 dark:bg-white dark:text-zinc-900"
-      >
-        Checkout (coming soon)
-      </button>
+      <SignedInCheckout />
     </>
   );
+}
+
+// Guests get the plain button (they type everything on the payment page). Signed-in customers
+// also choose one of their saved addresses, with the default one picked already.
+async function SignedInCheckout() {
+  const user = await getCurrentUser();
+  if (!user) return <CheckoutButton />;
+
+  const saved = await listAddresses(user.id);
+  const options: AddressOption[] = saved.map((address) => ({
+    id: address.id,
+    title: address.label ? `${address.label} · ${address.fullName}` : address.fullName,
+    summary: addressLines(address).join(", "),
+  }));
+  return <CheckoutButton addresses={options} defaultAddressId={saved.find((a) => a.isDefault)?.id} />;
 }

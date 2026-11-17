@@ -2,21 +2,26 @@
   "name": "bookshop",
   "version": "0.1.0",
   "private": true,
-    "scripts": {
+  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "postinstall": "node scripts/copy-map-worker.mjs"
   },
   "dependencies": {
+    "better-auth": "^1.7.23",
     "drizzle-orm": "^0.45.4",
+    "maplibre-gl": "^6.18.0",
     "next": "16.4.6",
+    "nodemailer": "^10.5.0",
     "pg": "^8.23.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "stripe": "^23.1.0"
   },
   "devDependencies": {
     "@tailwindcss/turbopack": "4.3.3",

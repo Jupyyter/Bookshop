@@ -1,4 +1,4 @@
-# Local development database. Start it with: docker compose up -d
+# Local development services. Start them with: docker compose up -d
 services:
   db:
     image: postgres:18
@@ -16,6 +16,15 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # A pretend mail server. It accepts every email the app sends and keeps it in an inbox you
+  # read in the browser at http://localhost:8025. Nothing ever reaches a real mailbox.
+  mail:
+    image: axllent/mailpit
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8025:8025" # the inbox web page
+      - "127.0.0.1:1025:1025" # SMTP: the app hands its emails over here
 
 volumes:
   pgdata:

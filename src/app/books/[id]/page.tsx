@@ -4,8 +4,12 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { Suspense } from "react";
 import { AddToCartButton } from "@/components/add-to-cart-button";
+import { CompareToggle } from "@/components/compare";
+import { WishlistButton } from "@/components/wishlist-button";
 import { coverUrl, getBookDetails, isBookId } from "@/lib/openlibrary";
 import { formatPrice, priceCentsFor } from "@/lib/pricing";
+import { getCurrentUser } from "@/lib/session";
+import { isInWishlist } from "@/lib/wishlist";
 
 type Params = PageProps<"/books/[id]">["params"];
 
@@ -92,6 +96,13 @@ async function BookDetailsView({ params }: { params: Params }) {
 
         <p className="mt-6 text-3xl font-semibold">{formatPrice(price)}</p>
         <AddToCartButton bookId={book.id} />
+        <div className="mt-4 flex flex-wrap items-center gap-6">
+          {/* Whether it's saved depends on who is looking, so only this small part waits for the visitor. */}
+          <Suspense fallback={<span className="inline-block h-12 w-28 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />}>
+            <SavedState bookId={book.id} />
+          </Suspense>
+          <CompareToggle bookId={book.id} title={book.title} />
+        </div>
 
         {book.description && (
           <p className="mt-6 whitespace-pre-line leading-relaxed">{book.description}</p>
@@ -109,6 +120,12 @@ async function BookDetailsView({ params }: { params: Params }) {
       </div>
     </div>
   );
+}
+
+async function SavedState({ bookId }: { bookId: string }) {
+  const user = await getCurrentUser();
+  const saved = user ? await isInWishlist(user.id, bookId) : false;
+  return <WishlistButton bookId={bookId} initiallySaved={saved} signedIn={Boolean(user)} />;
 }
 
 // Gray placeholder blocks shaped like the real page, so nothing jumps around when the book loads.

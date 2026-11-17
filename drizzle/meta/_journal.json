@@ -5,8 +5,50 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1794480108754,
+      "when": 1794460499921,
       "tag": "0000_create_carts",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794511500446,
+      "tag": "0001_create_orders",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794564711910,
+      "tag": "0002_create_shipments",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794611297866,
+      "tag": "0003_create_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794621161129,
+      "tag": "0004_addresses_and_cards",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794629197308,
+      "tag": "0005_wishlist",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794630632290,
+      "tag": "0006_returns",
       "breakpoints": true
     }
   ]
